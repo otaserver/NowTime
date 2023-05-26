@@ -207,7 +207,7 @@ object TimeNowWorker : Handler.Callback {
             if (Build.VERSION.SDK_INT >= 21) {
                 tts.speak(s, TextToSpeech.QUEUE_FLUSH, null, "time")
             } else {
-                tts.speak(s, TextToSpeech.QUEUE_FLUSH, null)
+                toast("不支持android5以下系统版本")
             }
 
         } else {
