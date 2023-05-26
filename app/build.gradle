@@ -13,6 +13,12 @@ android {
         versionCode 1
         versionName "1.0"
     }
+    namespace 'net.alpacaplayground.nowtime'
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
 
     //自动生成指定名称的release发布版的 apk文件
     android.applicationVariants.all { variant ->
