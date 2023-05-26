@@ -30,7 +30,8 @@ android {
 dependencies {
     //1.3.1支持androidSDK29.
     //1.4.0需要androidSDK最小为31.
-    def appcompat_version = "1.3.1"
+    //android版本升级为33后，可以把appcompat_version设置为最新的1.6.1，
+    def appcompat_version = "1.6.1"
     implementation "androidx.appcompat:appcompat:$appcompat_version"
     implementation "androidx.appcompat:appcompat-resources:$appcompat_version"
 
