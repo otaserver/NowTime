@@ -38,6 +38,8 @@ object TimeNowWorker : Handler.Callback {
     }
 
     val ttsListener = object : UtteranceProgressListener() {
+        //kotlin1.3迁移1.4提示修改，因为到1.9这个方法会取消。
+        @Deprecated("Deprecated in Java")
         override fun onError(utteranceId: String?) {
             releaseTts()
             toast("TTS异常:${utteranceId}")
