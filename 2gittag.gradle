@@ -1,0 +1,44 @@
+//gittag.gradle模板04(使用ext全局变量和task变量传递参数),2021-01-13修改
+
+//定义获取服务端git的tag，用于版本号和向客户端返回
+tasks.register("logVersion") {
+    //gradle中的分组，不定义则放在other分组中。
+    group = "otaserver"
+    description = "获取git的tag信息,向task和ext同时传递"
+
+    //提示：注意不要写doFirst,doLast.因为会延迟执行。导致android的defaultConfig获取不到属性。
+    def gitCommitShortHash = 'git log -1 --pretty=%h'.execute([], project.rootDir).text.trim()
+    def gitCommitDate = 'git log -1 --pretty=%ci'.execute([], project.rootDir).text.trim().split()[0]
+
+    // Auto-incrementing commit count based on counting commits to HEAD (Build #543)
+    def gitCommitCount = Integer.parseInt('git rev-list HEAD --count'.execute([], project.rootDir).text.trim())
+
+    // 使用git tags 作为版本名称，需要在当前分支下有tag标签，此命令会获取最后一个tag的名称。
+    def gitCurrentTag = 'git describe --tags --abbrev=0'.execute([], project.rootDir).text.trim()
+    def totalVersionName = gitCurrentTag + "_" + gitCommitDate + "_" + gitCommitShortHash
+
+    println "gitCommitDate==========" + gitCommitDate
+    println "gitCommitShortHash==========" + gitCommitShortHash
+    println "gitCommitCount===========" + gitCommitCount
+    println "gitCurrentTag============" + gitCurrentTag
+    println "totalVersionName============" + totalVersionName
+
+    //使用ext传递参数
+    project.ext.set("gitCommitDate", gitCommitDate)
+    project.ext.set("gitCommitShortHash", gitCommitShortHash)
+    project.ext.set("gitCommitCount", gitCommitCount)
+    project.ext.set("gitCurrentTag", gitCurrentTag)
+    project.ext.set("totalVersionName", totalVersionName)
+    //使用ext示例：
+    //project.ext.totalVersionName。数组示例可参考configAndroid.gradle
+
+    //使用task传递参数
+    ext.gitCommitDate = gitCommitDate
+    ext.gitCommitShortHash = gitCommitShortHash
+    ext.gitCommitCount = gitCommitCount
+    ext.gitCurrentTag = gitCurrentTag
+    ext.totalVersionName = totalVersionName
+    //使用task示例：
+    //直接使用：versionCode logVersion.gitCommitCount
+    //字符串变量：buildConfigField "String", "BUILD_TIME", "\"${logVersion.gitCommitDate}\""
+}

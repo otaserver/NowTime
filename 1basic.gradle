@@ -1,0 +1,47 @@
+//basic.gradle,基础通用配置模板02，作用是不用每个项目参数都写一遍。2023-09-28修改。
+
+android {
+    //使用ext获取变量示例
+    compileSdk rootProject.ext.android["compileSdk"]
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.android["minSdkVersion"]
+        targetSdkVersion rootProject.ext.android["targetSdkVersion"]
+        //添加多 dex分包支持
+        multiDexEnabled true
+    }
+
+    buildTypes {
+        release {
+            debuggable false
+            //ZipAlign优化
+            zipAlignEnabled true
+        }
+        debug {
+            debuggable true
+            zipAlignEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility rootProject.ext.compileOptions.sourceCompatibility
+        targetCompatibility rootProject.ext.compileOptions.targetCompatibility
+    }
+
+    //TODO：lint在gradle7写法有变化，需要确认后在打开
+    // lintOptions {
+    //     //Set whether lint should check for fatal errors during release builds. Default is true.
+    //     checkReleaseBuilds true
+    //     // 错误发生后继续gradle构建
+    //     abortOnError true
+    //     // 关闭lint检查，设成false可以免去每次lint花费的大量时间
+    //     lint.enabled true
+    // }
+}
+
+// 全局开启或关闭lint的执行方法,会忽略每个项目下的lint配置，方便加快编译速度.配置项在configAdnroid.gradle中
+if (!rootProject.ext.android["globalLintCheck"].toString().equalsIgnoreCase("null")) {
+    gradle.taskGraph.whenReady { graph ->
+        graph.allTasks.findAll { it.name ==~ /lint.*/ }*.enabled = rootProject.ext.android["globalLintCheck"]
+    }
+}

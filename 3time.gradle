@@ -1,0 +1,51 @@
+//3time.gradle文件，用于统计gradle执行时间模板02，2021-06-15修改,
+//此代码适配gradle7.0以上版本，删掉 @Override buildStarted()即可。因为BuildListener.buildStarted and Gradle.buildStarted have been deprecated。
+import java.util.concurrent.TimeUnit
+
+// Log timings per task.
+class TimingsListener implements TaskExecutionListener, BuildListener {
+    private long startTime
+    private timings = []
+
+    @Override
+    void beforeExecute(Task task) {
+        startTime = System.nanoTime()
+
+    }
+
+    @Override
+    void afterExecute(Task task, TaskState taskState) {
+        def ms = TimeUnit.MILLISECONDS.convert(System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
+        timings.add([ms, task.path])
+        task.project.logger.warn "${task.path} took ${ms}ms"
+    }
+
+    @Override
+    void buildFinished(BuildResult result) {
+        println "Task timings:"
+        for (timing in timings) {
+            if (timing[0] >= 50) {
+                printf "%7sms  %s\n", timing
+            }
+        }
+    }
+
+    @Override
+    void projectsEvaluated(Gradle gradle) {}
+
+    @Override
+    void projectsLoaded(Gradle gradle) {}
+
+    // gradle 7以下版本，需要打开注释。
+    // gradle 7以上版本，没有此方法。注释即可。
+    // @Override
+    // void buildStarted(Gradle gradle) {
+    //
+    // }
+
+    @Override
+    void settingsEvaluated(Settings settings) {}
+
+}
+
+gradle.addListener new TimingsListener()
